@@ -7,8 +7,8 @@ services:
       - "3000:3000"
       - "4000:50051"
     environment:
-      - "-m"
-      - "-s localhost:50051"
+      - MASTER=
+      - REPLICAS=
   
   # app_instance2:
   #   image: my-python-app
