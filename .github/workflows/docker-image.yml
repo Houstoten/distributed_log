@@ -3,16 +3,24 @@ name: Docker Image CI
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
+    permissions: write-all
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14
+
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag distributed_log:$(date +%s)
+      run: |
+        docker build . --file Dockerfile --tag distributed_log:$(date +%s)
+        docker login -u "${{ secrets.GITHUB_TOKEN }}" -p "${{ secrets.GITHUB_TOKEN }}" ghcr.io
+        docker tag pop-in ghcr.io/Houstoten/distributed_log:latest
+        docker push ghcr.io/Houstoten/distributed_log:latest
