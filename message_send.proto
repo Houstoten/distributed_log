@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+message Msg {
+    uint32 msg_id = 1;
+    string msg = 2;
+}
+
+message Empty {
+
+}
+
+service Receiver {
+    rpc NewMessage(Msg) returns (Empty) {}
+}

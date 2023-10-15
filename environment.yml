@@ -1,0 +1,11 @@
+name: distributed_log_86
+channels:
+- anaconda
+- conda-forge
+- defaults
+
+dependencies:
+- Flask
+- flask-restful
+- grpcio
+- grpcio-tools
