@@ -1,10 +1,11 @@
 import grpc
 
-# import the generated classes
 import message_send_pb2
 import message_send_pb2_grpc
 
 import threading
+import logging
+import time
 
 lock = threading.Lock()
 
@@ -25,6 +26,8 @@ class Controller:
         lock.release()
 
         if self.is_master:
+
+            logging.info("Sending message to replicas: " + msg)
             for replica in self.replicas:
                 channel = grpc.insecure_channel(replica)
                 stub = message_send_pb2_grpc.ReceiverStub(channel)
@@ -38,7 +41,11 @@ class Controller:
                         print("Error!")
                 except:
                     print("Error!")
-            # print('forward ', msg, ' to ', len(self.replicas), ' replicas')
+        else:
+            logging.info("Added new value from master: " + msg)
+            logging.info("Waiting 3 seconds...")
+            time.sleep(3)
+            logging.info("Releasing")
         return
     
     def get_messages(self):

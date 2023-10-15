@@ -1,6 +1,8 @@
 import argparse
 import run_master
 import run_replica
+import logging
+logging.basicConfig(level = logging.INFO)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Example script with -m and -s options.")

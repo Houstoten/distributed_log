@@ -1,6 +1,6 @@
-from public_api import create_api
+from public_api.public_api import create_api
 from controller.controller import Controller
-from replica_service import start_grpc_server
+from replica_service.replica_service import start_grpc_server
 import threading
 
 def setup():

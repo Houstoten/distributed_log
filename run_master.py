@@ -1,4 +1,4 @@
-from public_api import create_api
+from public_api.public_api import create_api
 from controller.controller import Controller
 
 def setup(replicas=[]):
