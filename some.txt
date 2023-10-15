@@ -2,7 +2,7 @@ aniso8601==9.0.1
 click==8.0.4
 Flask==2.2.2
 Flask-RESTful==0.3.9
-grpcio==1.42.0
+grpcio==1.59.1
 grpcio-tools==1.42.0
 itsdangerous==2.0.1
 Jinja2==3.1.2

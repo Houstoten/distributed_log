@@ -1,5 +1,7 @@
+setuptools
 Flask
 flask_restful
 grpcio
 grpcio-tools
 argparse
+protobuf==3.20.3
