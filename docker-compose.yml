@@ -7,13 +7,28 @@ services:
       - "3000:3000"
     environment:
       - MASTER=-m
-      - REPLICAS=-s localhost:50051
+      - REPLICAS=-s replica1:50051 replica2:50051 replica3:50051
   
-  secondary:
+  replica1:
     image: ghcr.io/houstoten/distributed_log:latest
     ports:
       - "3001:3000"
-      - "50051:50051"
+    environment:
+      - MASTER=
+      - REPLICAS=
+
+  replica2:
+    image: ghcr.io/houstoten/distributed_log:latest
+    ports:
+      - "3002:3000"
+    environment:
+      - MASTER=
+      - REPLICAS=
+
+  replica3:
+    image: ghcr.io/houstoten/distributed_log:latest
+    ports:
+      - "3003:3000"
     environment:
       - MASTER=
       - REPLICAS=
