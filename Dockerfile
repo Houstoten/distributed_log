@@ -45,4 +45,8 @@ RUN pip install --upgrade pip setuptools && \
 EXPOSE 3000 50051 
 
 # Command to run the application
-CMD ["python", "run.py"]
+
+ENV master ${1:+1}
+ENV replicas ${1:+1}
+
+CMD ["python", "run.py ${master} ${replicas}"]

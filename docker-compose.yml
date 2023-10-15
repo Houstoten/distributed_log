@@ -2,10 +2,13 @@ version: '1.0'
 
 services:
   master:
-    image: distributed_log:1.0
+    image: ghcr.io/houstoten/distributed_log:latest
     ports:
       - "3000:3000"
       - "4000:50051"
+    environment:
+      - "-m"
+      - "-s localhost:50051"
   
   # app_instance2:
   #   image: my-python-app
