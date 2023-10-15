@@ -1,0 +1,17 @@
+aniso8601==9.0.1
+click==8.0.4
+Flask==2.2.2
+Flask-RESTful==0.3.9
+grpcio==1.42.0
+grpcio-tools==1.42.0
+itsdangerous==2.0.1
+Jinja2==3.1.2
+MarkupSafe==2.1.1
+pip==23.2.1
+protobuf==3.20.3
+python-dateutil==2.8.2
+pytz==2023.3.post1
+setuptools==68.0.0
+six==1.16.0
+Werkzeug==2.2.3
+wheel==0.41.2
