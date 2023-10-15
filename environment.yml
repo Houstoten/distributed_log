@@ -9,3 +9,4 @@ dependencies:
 - flask-restful
 - grpcio
 - grpcio-tools
+- argparse
