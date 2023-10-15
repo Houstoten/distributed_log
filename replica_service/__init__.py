@@ -29,7 +29,7 @@ def start_grpc_server(callback_fn):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     message_servicer = MessageServicer(callback_fn)
     message_send_pb2_grpc.add_ReceiverServicer_to_server(message_servicer, server)
-    server.add_insecure_port('[::]:50051')
+    server.add_insecure_port('0.0.0.0:50051')
     server.start()
     print('gRPC server started on port 50051')
     try:

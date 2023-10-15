@@ -5,11 +5,19 @@ services:
     image: ghcr.io/houstoten/distributed_log:latest
     ports:
       - "3000:3000"
-      - "4000:50051"
+      # - "4000:50051"
+    environment:
+      - MASTER=-m
+      - REPLICAS=-s localhost:50051
+  
+  secondary:
+    image: ghcr.io/houstoten/distributed_log:latest
+    ports:
+      - "3001:3000"
+      - "50051:50051"
     environment:
       - MASTER=
       - REPLICAS=
-  
   # app_instance2:
   #   image: my-python-app
   #   environment:
