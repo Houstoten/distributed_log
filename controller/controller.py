@@ -9,6 +9,20 @@ import time
 
 lock = threading.Lock()
 
+def send_msg_to_replica(msg, id, replica):
+    channel = grpc.insecure_channel(replica)
+    stub = message_send_pb2_grpc.ReceiverStub(channel)
+    message = message_send_pb2.Msg(msg_id=id, msg=msg)
+
+    try:
+        response = stub.NewMessage(message)
+        if response:
+            print(f"{replica} OK!")
+        else:
+            print(f"{replica} Error!")
+    except:
+        print(f"{replica} Error!")
+
 class Controller:
     messages = []
     replicas = []
@@ -28,19 +42,20 @@ class Controller:
         if self.is_master:
 
             logging.info("Sending message to replicas: " + msg)
-            for replica in self.replicas:
-                channel = grpc.insecure_channel(replica)
-                stub = message_send_pb2_grpc.ReceiverStub(channel)
-                message = message_send_pb2.Msg(msg_id=index, msg=msg)
 
-                try:
-                    response = stub.NewMessage(message)
-                    if response:
-                        print("OK!")
-                    else:
-                        print("Error!")
-                except:
-                    print("Error!")
+            replica_threads = []
+            for replica in self.replicas:
+                rpc_req = threading.Thread(target=lambda: send_msg_to_replica(msg, index, replica))
+                replica_threads.append(rpc_req)
+                rpc_req.start()
+            
+            logging.info(f"Message sent to {len(replica_threads)} replicas.")
+            
+            for rpc_thr in replica_threads:
+                rpc_thr.join()
+            
+            logging.info("Message successfully replicated")
+
         else:
             logging.info("Added new value from master: " + msg)
             logging.info("Waiting 3 seconds...")
