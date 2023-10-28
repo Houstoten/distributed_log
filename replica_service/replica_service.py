@@ -11,7 +11,7 @@ class MessageServicer(message_send_pb2_grpc.ReceiverServicer):
         self.callback = callback
 
     def NewMessage(self, request, context):
-        self.callback(request.msg)
+        self.callback(request.msg, request.msg_id)
         response = message_send_pb2.Empty()
         return response
 

@@ -7,7 +7,7 @@ def setup():
     replica_controller = Controller(is_master=False)
 
     def start_grpc_server_with_callback():
-        start_grpc_server(replica_controller.add_message)
+        start_grpc_server(replica_controller.add_message_replica)
 
     server_thread = threading.Thread(target=start_grpc_server_with_callback)
     server_thread.start()

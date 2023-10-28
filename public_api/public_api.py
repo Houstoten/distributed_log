@@ -6,7 +6,7 @@ class MessageController(Resource):
         if not hasattr(self, 'masterCallback'):
             abort(404)
 
-        self.masterCallback(request.get_data(as_text=True))
+        self.masterCallback(request.get_data(as_text=True), request.args.get('write_concern'))
         pass
 
     def get(self):

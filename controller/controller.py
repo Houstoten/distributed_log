@@ -6,10 +6,30 @@ import message_send_pb2_grpc
 import threading
 import logging
 import time
+import random
+
+class CountDownLatch():
+    def __init__(self, count):
+        self.count = count
+        self.condition = threading.Condition()
+ 
+    def count_down(self):
+        with self.condition:
+            if self.count == 0:
+                return
+            self.count -= 1
+            if self.count == 0:
+                self.condition.notify_all()
+ 
+    def wait(self):
+        with self.condition:
+            if self.count == 0:
+                return
+            self.condition.wait()
 
 lock = threading.Lock()
 
-def send_msg_to_replica(msg, id, replica):
+def send_msg_to_replica(msg, id, replica, latch):
     channel = grpc.insecure_channel(replica)
     stub = message_send_pb2_grpc.ReceiverStub(channel)
     message = message_send_pb2.Msg(msg_id=id, msg=msg)
@@ -17,14 +37,18 @@ def send_msg_to_replica(msg, id, replica):
     try:
         response = stub.NewMessage(message)
         if response:
-            print(f"{replica} OK!")
+            print(f"{replica} OK!")    
         else:
             print(f"{replica} Error!")
     except:
         print(f"{replica} Error!")
+    
+    latch.count_down()
 
 class Controller:
     messages = []
+    #should be sorted dict
+    replica_messages = dict()
     replicas = []
     is_master = False
 
@@ -32,37 +56,46 @@ class Controller:
         self.is_master = is_master
         self.replicas = replicas
 
-    def add_message(self, msg):
-
+    def add_master_message(self, msg, write_concern = 1):
         lock.acquire()
         self.messages.append(msg)
         index = len(self.messages) - 1
         lock.release()
 
-        if self.is_master:
-
-            logging.info("Sending message to replicas: " + msg)
-
-            replica_threads = []
-            for replica in self.replicas:
-                rpc_req = threading.Thread(target=lambda: send_msg_to_replica(msg, index, replica))
-                replica_threads.append(rpc_req)
-                rpc_req.start()
-            
-            logging.info(f"Message sent to {len(replica_threads)} replicas.")
-            
-            for rpc_thr in replica_threads:
-                rpc_thr.join()
-            
-            logging.info("Message successfully replicated")
-
-        else:
-            logging.info("Added new value from master: " + msg)
-            logging.info("Waiting 3 seconds...")
-            time.sleep(3)
-            logging.info("Releasing")
+        logging.info("Sending message to replicas: " + msg)
+        latch = CountDownLatch(min(write_concern, len(self.replicas) + 1) - 1)
+        replica_threads = []
+        for replica in self.replicas:
+            rpc_req = threading.Thread(target=lambda: send_msg_to_replica(msg, index, replica, latch))
+            replica_threads.append(rpc_req)
+            rpc_req.start()
+        
+        logging.info(f"Message sent to {len(replica_threads)} replicas.")
+        latch.wait()
+        
+        logging.info("Message successfully replicated")
         return
     
+    def add_message_replica(self, msg, index):
+        lock.acquire()
+        if index not in self.replica_messages:
+           self.replica_messages[index] = msg
+        lock.release()
+
+        logging.info("Added new value from master: " + msg)
+        logging.info("Waiting 3 seconds...")
+        time.sleep(3)
+        logging.info("Releasing")
+        return
+
     def get_messages(self):
-        return self.messages
-        
+        if self.is_master:
+            return self.messages
+        else:
+            msgs_replica = []
+            for (k, v) in sorted(self.replica_messages.items(), key=lambda x: x[0]):
+                if k == len(msgs_replica):
+                    msgs_replica.append(v)
+                else:
+                    break
+            return msgs_replica
