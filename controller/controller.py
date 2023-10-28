@@ -56,14 +56,14 @@ class Controller:
         self.is_master = is_master
         self.replicas = replicas
 
-    def add_master_message(self, msg, write_concern = 1):
+    def add_master_message(self, msg, write_concern):
         lock.acquire()
         self.messages.append(msg)
         index = len(self.messages) - 1
         lock.release()
 
         logging.info("Sending message to replicas: " + msg)
-        latch = CountDownLatch(min(write_concern, len(self.replicas) + 1) - 1)
+        latch = CountDownLatch(len(self.replicas) if write_concern == 0 else min(write_concern - 1, len(self.replicas)))
         replica_threads = []
         for replica in self.replicas:
             rpc_req = threading.Thread(target=lambda: send_msg_to_replica(msg, index, replica, latch))
@@ -77,14 +77,16 @@ class Controller:
         return
     
     def add_message_replica(self, msg, index):
+
+        logging.info("Adding new value from master: " + msg)
+        logging.info("Waiting 3 seconds...")
+        time.sleep(3)
         lock.acquire()
         if index not in self.replica_messages:
            self.replica_messages[index] = msg
         lock.release()
 
         logging.info("Added new value from master: " + msg)
-        logging.info("Waiting 3 seconds...")
-        time.sleep(3)
         logging.info("Releasing")
         return
 
