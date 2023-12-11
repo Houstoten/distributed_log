@@ -59,30 +59,29 @@ def send_missed_on_appear(missing_pair, stub):
     stub.BatchUpdate(sync_replica_request)
 
 def heartbeat_replicas(replicas, not_available, all_messages):
-    print(1)
     for replica in replicas:
         channel = grpc.insecure_channel(replica)
         stub = sync_replica_pb2_grpc.SyncReplicaStub(channel)
         was_missing_msg = sync_replica_pb2.OneBeat(was_missing=True if replica in not_available else False) 
 
         print(replica, ' ----------------------------')
-        # try:
-        response = stub.HeartBeat(was_missing_msg)
-        if response:
-            print(f"{replica} Alive!")    
-            if replica in not_available: 
+        try:
+            response = stub.HeartBeat(was_missing_msg)
+            if response:
+                print(f"{replica} Alive!")    
+                if replica in not_available: 
 
-                missing_ids = list(set(range(len(all_messages))) - set(response.known_ids))
-                missing_items = [i for j, i in enumerate(all_messages) if j not in response.known_ids]
-                send_missed_on_appear((missing_ids, missing_items), stub)
+                    missing_ids = list(set(range(len(all_messages))) - set(response.known_ids))
+                    missing_items = [i for j, i in enumerate(all_messages) if j not in response.known_ids]
+                    send_missed_on_appear((missing_ids, missing_items), stub)
 
-                not_available.remove(replica)
-        else:
+                    not_available.remove(replica)
+            else:
+                print(f"{replica} Missing!")
+                not_available.add(replica)
+        except:
             print(f"{replica} Missing!")
             not_available.add(replica)
-        # except:
-        #     print(f"{replica} Missing!")
-        #     not_available.add(replica)
     
     return None
 
