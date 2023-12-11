@@ -154,4 +154,4 @@ class Controller:
         while True:
             time.sleep(5)
             logging.info("Heartbeat!")
-            # heartbeat_replicas(self.replicas, self.missing_replicas, self.messages)
+            heartbeat_replicas(self.replicas, self.missing_replicas, self.messages)
