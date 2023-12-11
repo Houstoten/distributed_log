@@ -12,7 +12,7 @@ def setup():
     server_thread = threading.Thread(target=start_grpc_server_with_callback)
     server_thread.start()
 
-    create_api(getter=replica_controller.get_messages).run(port=3001, host="0.0.0.0")
+    create_api(getter=replica_controller.get_messages).run(port=3000, host="0.0.0.0")
 
 if __name__ == "__main__":
     setup()
