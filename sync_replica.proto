@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+message OneBeat {
+    bool was_missing = 1;
+}
+
+message KnownMessages {
+    repeated uint32 known_ids = 1;
+}
+
+message MissedMessages {
+    repeated uint32 ids = 1;
+    repeated string values = 2;
+}
+
+message BoolEmpty {
+
+}
+
+service SyncReplica {
+    rpc HeartBeat(OneBeat) returns (KnownMessages) {}
+    rpc BatchUpdate(MissedMessages) returns (BoolEmpty) {}
+}
+
