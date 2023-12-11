@@ -150,7 +150,10 @@ class Controller:
         self.replica_messages = self.replica_messages | new_dict
     
     def heartbeat(self):
-        while True:
-            print("Heartbeat!")
-            heartbeat_replicas(self.replicas, self.missing_replicas, self.messages)
-            time.sleep(5)
+        try: 
+            while True:
+                print("Heartbeat!")
+                heartbeat_replicas(self.replicas, self.missing_replicas, self.messages)
+                time.sleep(5)
+        except Exception as e:
+            print("Exception in heartbeat thread:", str(e))
