@@ -10,7 +10,6 @@ import threading
 import logging
 import time
 import random
-import schedule
 
 class CountDownLatch():
     def __init__(self, count):
