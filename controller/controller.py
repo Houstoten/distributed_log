@@ -153,6 +153,6 @@ class Controller:
     
     def heartbeat(self):
         while True:
+            time.sleep(5)
             print("Heartbeat!")
             heartbeat_replicas(self.replicas, self.missing_replicas, self.messages)
-            time.sleep(5)
