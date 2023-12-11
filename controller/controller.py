@@ -40,11 +40,11 @@ def send_msg_to_replica(msg, id, replica, latch, missing_replicas):
     try:
         response = stub.NewMessage(message)
         if response:
-            print(f"{replica} OK!")    
+            logging.info(f"{replica} OK!")    
 
             if replica in missing_replicas: missing_replicas.remove(replica)
         else:
-            print(f"{replica} Error!")
+            logging.info(f"{replica} Error!")
             missing_replicas.add(replica)
     except:
         missing_replicas.add(replica)
@@ -64,11 +64,10 @@ def heartbeat_replicas(replicas, not_available, all_messages):
         stub = sync_replica_pb2_grpc.SyncReplicaStub(channel)
         was_missing_msg = sync_replica_pb2.OneBeat(was_missing=True if replica in not_available else False) 
 
-        print(replica, ' ----------------------------')
         try:
             response = stub.HeartBeat(was_missing_msg)
             if response:
-                print(f"{replica} Alive!")    
+                logging.info(f"{replica} Alive!")    
                 if replica in not_available: 
 
                     missing_ids = list(set(range(len(all_messages))) - set(response.known_ids))
@@ -77,10 +76,10 @@ def heartbeat_replicas(replicas, not_available, all_messages):
 
                     not_available.remove(replica)
             else:
-                print(f"{replica} Missing!")
+                logging.info(f"{replica} Missing!")
                 not_available.add(replica)
         except:
-            print(f"{replica} Missing!")
+            logging.info(f"{replica} Missing!")
             not_available.add(replica)
     
     return None
