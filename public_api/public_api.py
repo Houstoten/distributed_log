@@ -21,11 +21,25 @@ class MessageController(Resource):
     def set_getter(cls, getter):
         cls.getter = getter
         return cls
+        
+class HealthController(Resource):
+    def get(self):
+        return self.health_check()
+    
+    @classmethod
+    def set_health_check(cls, callback):
+        cls.health_check = callback
+        return cls
 
-def create_api(getter, masterCallback=None):
+def create_api(getter, masterCallback=None, health_check=None):
     app = Flask(__name__)
     api = Api(app)
     DomainMessageController = MessageController
+
+    if health_check is not None:
+        DomainHealthController = HealthController
+        DomainHealthController = DomainHealthController.set_health_check(health_check)
+        api.add_resource(DomainHealthController, '/health')
 
     if masterCallback is not None:
         DomainMessageController = DomainMessageController.set_master_callback(masterCallback)
